@@ -1,0 +1,5 @@
+modules:
+  http_2xx:
+    prober: http
+  http-post_2xx:
+    prober: http

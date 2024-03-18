@@ -1,0 +1,119 @@
+version: "3"
+services:
+  nginx:
+    container_name: nginx-otusobserv
+    build: ./nginx/
+    ports:
+      - "80:80"
+    depends_on:
+      - php-fpm
+    volumes:
+      - ./www:/var/www/html
+    networks:
+      - otusobserv
+
+  php-fpm:
+    container_name: php-fpm-otusobserv
+    build: ./php-fpm/
+    env_file:
+      - ./.env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - XDEBUG_SESSION=docker-server
+    volumes:
+      - ./www:/var/www/html
+    networks:
+      - otusobserv
+
+  postgres:
+    container_name: postgres-otusobserv
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    networks:
+      - otusobserv
+
+  prometheus:
+    container_name: prometheus-otusobserv
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - otusobserv
+
+  node-exporter:
+    container_name: node-exporter-otusobserv
+    image: prom/node-exporter
+    ports:
+      - "9100:9100"
+    depends_on:
+      - prometheus
+    networks:
+      - otusobserv
+
+  nginx-exporter:
+    container_name: nginx-exporter-otusobserv
+    image: nginx/nginx-prometheus-exporter:latest
+    restart: always
+    ports:
+      - "9113:9113"
+    environment:
+      - NGINX_STATUS_URI=http://nginx/basic_status
+    depends_on:
+      - prometheus
+      - nginx
+    networks:
+      - otusobserv
+
+  php-fpm-exporter:
+    container_name: php-fpm-exporter-otusobserv
+    image: hipages/php-fpm_exporter:latest
+    ports:
+      - "9253:9253"
+    environment:
+      PHP_FPM_SCRAPE_URI: "tcp://php-fpm:9000/status"
+      PHP_FPM_LOG_LEVEL: "debug"
+    depends_on:
+      - prometheus
+      - php-fpm
+    networks:
+      - otusobserv
+
+  postgres-exporter:
+    container_name: postgres-exporter-otusobserv
+    image: quay.io/prometheuscommunity/postgres-exporter
+    ports:
+      - "9187:9187"
+    volumes:
+      - ./postgres-exporter/queries.yml:/etc/postgres_exporter/queries.yml
+    command: --extend.query-path=/etc/postgres_exporter/queries.yml
+    depends_on:
+      - prometheus
+      - postgres
+    networks:
+      - otusobserv
+
+  blackbox-exporter:
+    container_name: blackbox-exporter-otusobserv
+    image: prom/blackbox-exporter
+    ports:
+      - '9115:9115'
+    command:
+      - '--config.file=/etc/blackbox_exporter/config.yml'
+    volumes:
+      - ./blackbox-exporter/config.yml:/etc/blackbox_exporter/config.yml
+    depends_on:
+      - prometheus
+    networks:
+      - otusobserv
+
+networks:
+  otusobserv:
+    driver: bridge
