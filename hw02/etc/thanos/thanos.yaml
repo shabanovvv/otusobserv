@@ -1,0 +1,14 @@
+global:
+  grpc_address: "0.0.0.0:10901"
+
+objstore:
+  config:
+    type: S3
+    bucket: "salavey"
+    endpoint: "https://storage.yandexcloud.net"
+    access_key: "YCAJEGKuzeUXKHfkrAvx4Z2RW"
+    secret_key: "YCMwg_lI3j_3-FnM48KvXid96IpXokphwVrUZKbd"
+
+query:
+  frontend:
+    address: "0.0.0.0:10902"

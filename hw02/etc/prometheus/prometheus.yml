@@ -26,7 +26,20 @@ rule_files:
 
 remote_write:
   - url: 'http://otusphp.twc1.net:9009/api/v1/push'
+    writeRelabelConfigs:
+      - sourceLabels: []
+        targetLabel: site
+        replacement: prod
   - url: 'http://otusphp.twc1.net:10901/api/v1/receive'
+    writeRelabelConfigs:
+      - sourceLabels: []
+        targetLabel: site
+        replacement: prod
+
+storage:
+  tsdb:
+    path: /var/lib/prometheus/data
+    retention: 365d  # Установите retention period в 1 год (365 дней)
 
 scrape_configs:
   # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
@@ -66,10 +79,10 @@ scrape_configs:
   - job_name: 'blackbox-exporter'
     metrics_path: /probe
     params:
-      module: [http_2xx] 
+      module: [http_2xx]
     static_configs:
       - targets:
-          - http://salavey.net 
+          - http://salavey.net
           - https://portal.salavey.net
     relabel_configs:
       - source_labels: [__address__]
