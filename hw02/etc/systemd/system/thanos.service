@@ -1,0 +1,13 @@
+[Unit]
+Description=Thanos Query
+
+[Service]
+ExecStart=/usr/local/bin/thanos sidecar \
+    --config.file /etc/thanos/thanos.yaml \
+    --http-address 0.0.0.0:10902 \
+    --grpc-address 0.0.0.0:10901
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
