@@ -3,9 +3,8 @@ Description=Thanos Query
 
 [Service]
 ExecStart=/usr/local/bin/thanos sidecar \
-    --config.file /etc/thanos/thanos.yaml \
-    --http-address 0.0.0.0:10902 \
-    --grpc-address 0.0.0.0:10901
+    --tsdb.path            /usr/loca/bin/thanos_tsdb \
+    --prometheus.url       "http://otusphp.twc1.net:9090"
 
 Restart=always
 

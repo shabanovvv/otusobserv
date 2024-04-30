@@ -1,0 +1,22 @@
+groups:
+  - name: node_rules
+    rules:
+      - alert: HighDiskUsage
+        expr: (node_filesystem_avail_bytes{mountpoint="/", fstype !~"tmpfs|shm|sockfs"} / node_filesystem_size_bytes{mountpoint="/", fstype !~"tmpfs|shm|sockfs"}) * 100 < 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Высокое использование диска на {{ $labels.instance }}"
+          description: "Осталось менее 10% свободного места на диске на {{ $labels.instance }}. Необходимо освободить место или добавить новый диск."
+
+  - name: web_rules
+    rules:
+      - alert: WebsiteDown
+        expr: probe_http_status_code == 200
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Сайт {{ $labels.instance }} недоступен"
+          description: "Сайт {{ $labels.instance }} вернул HTTP статус код {{ $value }} и не отвечает на запросы."

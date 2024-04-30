@@ -1,0 +1,13 @@
+# Параметры HTTP-сервера
+http:
+  # HTTP-порт для приема запросов
+  listen: ":8428"
+
+# Параметры хранилища данных
+dataPartitionPeriod: 1d  # Период партиционирования данных (1d = 1 день)
+
+# Параметры удаленной записи (remote write)
+remoteWrite:
+  # Список удаленных Prometheus-серверов для записи метрик
+  urls:
+    - http://otusphp.twc1.net:9090/api/v1/write

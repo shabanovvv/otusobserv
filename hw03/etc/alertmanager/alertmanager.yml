@@ -1,0 +1,50 @@
+global:
+  resolve_timeout: 5m
+  smtp_from: 'shabanov-www@yandex.ru'
+  smtp_smarthost: 'smtp.yandex.ru:465'
+  smtp_auth_username: 'shabanov-www@yandex.ru'
+  smtp_auth_password: 'jmkqobyksfirjynm'
+  smtp_require_tls: true
+
+route:
+  receiver: 'default-receiver'
+  group_by: ['alertname', 'severity']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 1h
+
+  routes:
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+    - match:
+        severity: warning
+      receiver: 'warning-alerts'
+
+receivers:
+  - name: 'critical-alerts'
+    telegram_configs:
+      - bot_token: '6879622041:AAFKmH-7tai_riUzdNn1q16iAvmOTlcIfOE'
+        chat_id: 1220286085
+        send_resolved: true
+    email_configs:
+      - to: 'saveliy@mail.ru'
+        send_resolved: true
+
+  - name: 'warning-alerts'
+    telegram_configs:
+      - bot_token: '6879622041:AAFKmH-7tai_riUzdNn1q16iAvmOTlcIfOE'
+        chat_id: 1220286085
+        send_resolved: true
+    email_configs:
+      - to: 'saveliy@mail.ru'
+        send_resolved: true
+
+  - name: 'default-receiver'
+    telegram_configs:
+      - bot_token: '6879622041:AAFKmH-7tai_riUzdNn1q16iAvmOTlcIfOE'
+        chat_id: 1220286085
+        send_resolved: true
+    email_configs:
+      - to: 'saveliy@mail.ru'
+        send_resolved: true
